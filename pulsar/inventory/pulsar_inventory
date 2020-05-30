@@ -1,0 +1,14 @@
+
+[zookeeper]
+zook[01:03]
+
+
+[brokers]
+brokers[01:03]
+
+[bookie]
+bookie[01:03]
+
+[servers:children]
+brokers
+bookie

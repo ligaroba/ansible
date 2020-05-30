@@ -1,0 +1,23 @@
+
+
+zookeeper_nodes :
+  - zook01:2181
+  - zook02:2181
+  - zook03:2181
+
+cluster_name : 'Bigdata Analytics'
+
+# setup directories   
+installation_dir : /opt/pulsar
+pulsar_log_dir : /data/logs/pulsar 
+bookie_data_dir : /data/pulsar/data
+
+
+# pulsar binary download url 
+
+pulsar_binary_download_url : https://archive.apache.org/dist/pulsar/pulsar-2.5.2/apache-pulsar-2.5.2-bin.tar.gz
+
+
+# Pulsar offloaders binary download url 
+
+

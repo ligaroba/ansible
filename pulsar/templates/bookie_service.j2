@@ -1,0 +1,20 @@
+[Unit]
+Description=Pulsar Bookkeeper Daemon
+Documentation=https://pulsar.apache.org/docs/
+Requires=network.target
+After=network.target
+
+[Service]
+Type=forking
+WorkingDirectory={{pulsar_root_installation_dir}}
+User=pulsar
+Group=pulsar
+
+ExecStart={{pulsar_root_installation_dir}}/bin/pulsar-daemon start bookie 
+ExecStop={{pulsar_root_installation_dir}}/bin/pulsar-daemon stop bookie 
+#ExecReload={{pulsar_root_installation_dir}}/bin/pulsar-daemon restart bookie 
+TimeoutSec=30
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,8 @@
+
+#Zookeeper  server config 
+
+isPulsarNodes : false 
+
+service_ports : 
+  - 2181
+service_name : zk.service 

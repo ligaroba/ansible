@@ -1,0 +1,30 @@
+config_files :
+   - { src: 'broker.j2',dest: 'broker.conf'}
+   - { src: 'log4j2.j2',dest: 'log4j2.yaml' }
+   - { src: 'discovery.j2',dest: 'discovery.conf' }
+   - { src: 'websocket.j2',dest: 'websocket.conf' }
+   - { src: 'pulsar_env.j2',dest: 'pulsar_env.sh' }
+   - { src: 'pulsar_tools_env.j2',dest: 'pulsar_tools_env.sh' }
+
+
+systemd_service_conf :
+   - { src: 'broker_service.j2',dest: 'broker.service'}
+
+service_name : broker.service
+
+
+service_ports :
+  - 6650
+  - 6651
+  - 8443 
+  - 8080 
+
+
+# 6650 - brokerServicePort = Broker data port
+# 6651 - brokerServicePortTls = Broker data port for TLS
+# 8443 - webServicePortTls = Port to use to server HTTPS request
+# 8080 - webServicePort = Port to use to server HTTP request
+
+
+isPulsarNodes : true 
+

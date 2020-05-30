@@ -1,0 +1,19 @@
+[Unit]
+Description=Pulsar Broker Daemon
+Documentation=https://pulsar.apache.org/docs/
+Requires=network.target
+After=network.target
+
+[Service]
+Type=forking
+WorkingDirectory={{pulsar_root_installation_dir}}
+User=pulsar
+Group=pulsar
+ExecStart={{pulsar_root_installation_dir}}/bin/pulsar-daemon start broker 
+ExecStop={{pulsar_root_installation_dir}}/bin/pulsar-daemon stop broker 
+#ExecReload={{pulsar_root_installation_dir}}/bin/pulsar-daemon restart broker 
+TimeoutSec=30
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,20 @@
+config_files : 
+   - { src: 'bookkeeper.j2',dest: 'bookkeeper.conf' }
+   - { src: 'log4j2.j2',dest: 'log4j2.yaml' }
+   - { src: 'discovery.j2',dest: 'discovery.conf' }
+   - { src: 'websocket.j2',dest: 'websocket.conf' }
+   - { src: 'pulsar_env.j2',dest: 'pulsar_env.sh' }
+   - { src: 'pulsar_tools_env.j2',dest: 'pulsar_tools_env.sh' }
+
+
+systemd_service_conf :
+   - { src: 'bookie_service.j2' , dest: 'bookie.service'}
+
+service_name : bookie.service
+
+service_ports :
+  - 3181
+
+
+isPulsarNodes : true
+ 

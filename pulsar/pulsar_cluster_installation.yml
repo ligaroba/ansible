@@ -1,0 +1,123 @@
+- name: Pulsar Cluster Installation
+  hosts : all #brokers
+  become : yes
+  become_user : root
+  become_method : sudo  
+
+  environment :
+    http_proxy : http://proxy01:8080
+    ftp_proxy : http://proxy01:8080
+    https_proxy : http://proxy01:8080
+
+  vars :
+     number_of_elements : "{{ pulsar_binary_download_url.split('/') | length  }}"
+     downloaded_binary_compressed_file_path : "{{ installation_dir }}/{{ pulsar_binary_download_url.split('/')[number_of_elements |int -1]}}"
+     pulsar_config_dir : "{{ downloaded_binary_compressed_file_path.split('-bin')[0]}}/conf/"
+     pulsar_root_installation_dir: "{{ downloaded_binary_compressed_file_path.split('-bin')[0]}}"
+     systemd_service_path : /etc/systemd/system/
+
+  tasks :
+
+    - name : Creating pulsar group 
+      group :
+        name : pulsar 
+        state : present 
+        gid : 7000 
+      when : isPulsarNodes |bool
+
+
+    - name : Creating pulsar user 
+      user :
+        name : pulsar 
+        uid : 7000
+        groups : pulsar,wheel 
+        append : yes
+        state : present 
+        comment : Pulsar service user 
+      when : isPulsarNodes |bool
+
+    - name  : Creating Pulsar directories
+      file : 
+         path : "{{ item }}"
+         state : directory
+         owner: pulsar
+         group: pulsar
+         mode: 0755
+      when : isPulsarNodes |bool
+      with_items :
+           - "{{ installation_dir }}"
+           - "{{ pulsar_log_dir }}"
+           - "{{ bookie_data_dir }}"  
+
+      
+    
+    - name : Downloading pulsar tar files  
+      get_url : 
+         url : "{{ pulsar_binary_download_url }}"
+         dest : "{{downloaded_binary_compressed_file_path}}"
+         validate_certs : no
+         use_proxy : yes
+      when : isPulsarNodes |bool
+            
+
+    - name : Extrating Downloaded binary file
+      unarchive : 
+         src : "{{downloaded_binary_compressed_file_path}}"
+         dest : "{{installation_dir}}"
+         owner: pulsar
+         mode: 0755
+         remote_src : yes
+      when : isPulsarNodes |bool 
+
+    - name : Copying configuration files to hosts
+      template :
+        src : "{{ item.src }}"
+        dest : "{{pulsar_config_dir}}{{ item.dest }}"
+        remote_src : no
+        force: true
+        owner: pulsar
+        group: pulsar
+        mode: "u=rw,g=r,o=r"
+      when : isPulsarNodes |bool
+      with_items :
+        - "{{ config_files }}"
+        
+    
+    - name : Copying service files
+      template :
+        src : "{{ item.src }}"
+        dest : "{{systemd_service_path}}{{ item.dest }}"
+        remote_src : no
+        force: true
+        owner : root        
+        mode: "u=rw,g=r,o=r"       
+      when : isPulsarNodes |bool
+      with_items :
+        - "{{ systemd_service_conf }}"
+
+    - name : Opening service ports
+      firewalld : 
+        port : "{{item}}/tcp" 
+        permanent : yes 
+        state : enabled 
+        zone : public 
+      with_items :
+        - "{{service_ports}}"
+ 
+    - name : Stopping Services 
+      systemd : 
+       state : stopped  
+       name : "{{service_name}}"
+       daemon_reload : yes 
+       enabled: yes
+      when : isPulsarNodes |bool
+  
+        
+    - name : Starting Services 
+      systemd : 
+       state : started 
+       name : "{{service_name}}"
+       daemon_reload : yes 
+       enabled: yes
+  
+ 
